@@ -126,7 +126,6 @@ namespace InfShow
 
 
         }
-        #region - 系统消息 -
 
         protected virtual IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
@@ -150,6 +149,4 @@ namespace InfShow
     }
      
     
-    #endregion
-
 }
