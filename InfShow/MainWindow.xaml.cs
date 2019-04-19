@@ -121,7 +121,7 @@ namespace InfShow
             {
                 ret = "";
             }
-            if(ret!="")
+            if (ret != "")
                 lb.Content = ret;
 
 
@@ -148,6 +148,8 @@ namespace InfShow
             return IntPtr.Zero;
         }
     }
-        #endregion
+     
+    
+    #endregion
 
 }
