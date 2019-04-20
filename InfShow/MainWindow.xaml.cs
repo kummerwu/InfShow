@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Microsoft.CSharp;
+using System.CodeDom.Compiler;
+using System.Windows.Controls;
 
 namespace InfShow
 {
@@ -45,14 +37,53 @@ namespace InfShow
         public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
 
         Action ClipboardChangedHandle;
+        ScriptMgr _mgr = null;
+        ScriptMgr Mgr
+        {
+            get
+            {
+                if(_mgr==null)
+                {
+                    
+                     _mgr = new ScriptMgr();
+                    _mgr.Load();
+                    scripts.Items.Clear();
+                    foreach (string n in _mgr.GetScriptsName())
+                    {
+                        MenuItem it = new MenuItem() { Header = n };
+                        it.IsCheckable = true;
+                        it.IsChecked = (n == ScriptName);
+                        it.Click += It_Click;
+                        scripts.Items.Add(it);
+                    }
+                }
+                return _mgr;
+            }
+        }
+
+        private void It_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem it = sender as MenuItem;
+            if(it!=null && it.Header as string !=null)
+            {
+                ScriptName = it.Header as string;
+                foreach(MenuItem tmp in scripts.Items)
+                {
+                    tmp.IsChecked = (tmp == it);
+                }
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             Left = 0;
             Top = 0;
             Height = 60;
-            Width = 200;
+            Width = 250;
             ClipboardChangedHandle = new Action(this.OnClipboardChanged);
+            Mgr.GetScriptsName();
+            
         }
 
         private void Window_MouseMove(object sender, MouseEventArgs e)
@@ -88,40 +119,22 @@ namespace InfShow
             }
 
         }
-        Regex r10 = new Regex("^[0-9]+$");
-        Regex r16 = new Regex("^(0x|0X)?[0-9a-fA-F]+$");
-        /// <summary> 剪贴板内容改变 </summary>
 
+        /// <summary> 剪贴板内容改变 </summary>
+        string ScriptName = "Convert1016";
         void OnClipboardChanged()
         {
             // HTodo  ：复制的文件路径 
             string ret = "";
             try
             {
-                string text = System.Windows.Clipboard.GetText();
-                if (!string.IsNullOrEmpty(text))
-                {
-                    text = text.Trim();
-                    if (r10.IsMatch(text))
-                    {
-                        long i = long.Parse(text);
-                        long i16 = long.Parse(text, System.Globalization.NumberStyles.HexNumber);
-                        ret = string.Format("{0} <-> 0x{0:X}\r\n{1} <-> 0x{1:X}", i, i16);
-                    }
-                    else if (r16.IsMatch(text))
-                    {
-                        if (text.StartsWith("0x") || text.StartsWith("0X")) text = text.Substring(2);
-                        long i16 = long.Parse(text, System.Globalization.NumberStyles.HexNumber);
-                        ret = string.Format("{0} <-> 0x{0:X} ", i16);
-                    }
-
-                }
+                ret = Mgr.RunScript(ScriptName);
             }
-            catch
+            catch(Exception ee)
             {
                 ret = "";
             }
-            if (ret != "")
+            if (!string.IsNullOrEmpty(ret))
                 lb.Content = ret;
 
 
@@ -145,6 +158,28 @@ namespace InfShow
             }
 
             return IntPtr.Zero;
+        }
+
+        private void delMItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            _mgr = null;
+            Mgr.GetScriptsName();
+        }
+
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+            
+        }
+
+        private void MenuAbout_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("没有什么好说的,有事敲门：wu.daokui@zte.com.cn", "wu.daokui@zte.com.cn", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
      

@@ -5,13 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InfShow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" ResizeMode="CanResizeWithGrip" Opacity="1.0" 
+        Title="MainWindow" Height="60" Width="250" ResizeMode="CanResizeWithGrip" Opacity="1.0" 
         MouseMove="Window_MouseMove"
         
         Topmost="True"
         WindowStyle="None" 
 >
     <Grid>
-        <Label Name="lb"></Label>
+        <Label Name="lb">
+            
+        </Label>
+        <Grid.ContextMenu>
+            <ContextMenu Name="contextMenu">
+                <MenuItem Name="scripts" Header="脚本列表" ></MenuItem>
+                <MenuItem Header="重新加载脚本" Click="MenuItem_Click"></MenuItem>
+                <MenuItem Header="关于" Click="MenuAbout_Click"></MenuItem>
+                <MenuItem Header="退出" Click="MenuItemExit_Click"></MenuItem>
+            </ContextMenu>
+        </Grid.ContextMenu>
     </Grid>
 </Window>
